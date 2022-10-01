@@ -3,6 +3,8 @@
 #include "maze_gen.h"
 #include <QofL/log.h>
 #include <array>
+#include <iomanip>
+#include <sstream>
 #include <string>
 
 auto genMaze(int sz) -> std::vector<bool>
@@ -10,7 +12,7 @@ auto genMaze(int sz) -> std::vector<bool>
   srand(time(nullptr));
   auto weights = std::vector<int>{};
   for (auto i = 0; i < sz * (2 * sz - 1); ++i)
-    weights.push_back(rand() % 100);
+    weights.push_back(exp(rand() % 1000 / 50.));
 
   auto state = std::vector<std::pair<int, int>>{};
   for (auto i = 0; i < sz * sz; ++i)
@@ -33,7 +35,9 @@ auto genMaze(int sz) -> std::vector<bool>
         if (xx < 0 || xx >= sz || yy < 0 || yy >= sz)
           continue;
         const auto pp = xx + yy * sz;
-        const auto w = weights[x + d.first + 2 * y + d.second] + state[p].second;
+        const auto dx = d.first == 1 ? 0 : -1;
+        const auto dy = d.second;
+        const auto w = weights[x + dx + 2 * y + dy] + state[p].second;
         if (state[pp].first != -1 && state[pp].second <= w)
           continue;
         state[pp].second = w;
@@ -47,10 +51,10 @@ auto genMaze(int sz) -> std::vector<bool>
 
   for (auto y = 0; y < sz; ++y)
   {
-    std::string l;
+    std::ostringstream l;
     for (auto x = 0; x < sz; ++x)
-      l += std::to_string(state[x + y * sz].first);
-    LOG(l);
+      l << std::setw(2) << state[x + y * sz].first;
+    LOG(l.str());
   }
 
   auto ret = std::vector<bool>{};
@@ -77,12 +81,14 @@ auto genMaze(int sz) -> std::vector<bool>
           const auto nn = state[pp].first;
           if (nn == n - 1)
           {
-            if (!ret[xx + d.first + (2 * yy + d.second) * sz])
+            const auto dx = d.first == -1 ? -1 : 0;
+            const auto dy = d.second;
+            if (!ret[xx + dx + (2 * yy + dy) * sz])
             {
               wholePath = true;
               break;
             }
-            ret[xx + d.first + (2 * yy + d.second) * sz] = false;
+            ret[xx + dx + (2 * yy + dy) * sz] = false;
             xx = xxx;
             yy = yyy;
             break;

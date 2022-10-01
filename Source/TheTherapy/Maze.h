@@ -15,8 +15,32 @@ public:
   // Sets default values for this actor's properties
   AMaze();
 
-protected:
-  virtual auto size() const -> int;
+  UPROPERTY(EditAnywhere)
+  int sz = 8;
+
+  UPROPERTY(EditAnywhere)
+  int startCorner = 0;
+
+  UPROPERTY(EditAnywhere)
+  int endCorner = 1;
+
+  UPROPERTY(EditAnywhere)
+  class USceneComponent *root;
+
+  UPROPERTY(EditAnywhere)
+  class UInstancedStaticMeshComponent *cornerShort;
+
+  UPROPERTY(EditAnywhere)
+  class UInstancedStaticMeshComponent *cornerTall;
+
+  UPROPERTY(EditAnywhere)
+  class UInstancedStaticMeshComponent *wallShort;
+
+  UPROPERTY(EditAnywhere)
+  class UInstancedStaticMeshComponent *wallTall;
+
+  UPROPERTY(EditAnywhere)
+  class UInstancedStaticMeshComponent *floor;
 
 private:
   // Called when the game starts or when spawned
@@ -25,10 +49,4 @@ private:
 
   // Called every frame
   auto Tick(float DeltaTime) -> void final;
-
-  class USceneComponent *root;
-  class UInstancedStaticMeshComponent *cornerShort;
-  class UInstancedStaticMeshComponent *cornerTall;
-  class UInstancedStaticMeshComponent *wallShort;
-  class UInstancedStaticMeshComponent *wallTall;
 };
