@@ -18,6 +18,7 @@ UNREALROOTPATH=/mnt/Texas/prj/ue5
 BUILD=${UNREALROOTPATH}/Engine/Build/BatchFiles/Linux/Build.sh
 
 ${BUILD}  \
+    -ModuleWithSuffix=${PrjName},$(rand_suffix) \
     ${PrjName}Editor \
     Linux \
     Development \
@@ -26,4 +27,3 @@ ${BUILD}  \
     -IgnoreJunk \
     -progress
 
-#    -ModuleWithSuffix=${PrjName},$(rand_suffix) \

@@ -49,5 +49,9 @@ ATheTherapyCharacter::ATheTherapyCharacter()
 void ATheTherapyCharacter::Tick(float DeltaSeconds)
 {
   Super::Tick(DeltaSeconds);
-  LOG("test");
+}
+
+auto ATheTherapyCharacter::BeginPlay() -> void
+{
+  Super::BeginPlay();
 }
