@@ -37,17 +37,28 @@ AMaze::AMaze()
 auto AMaze::BeginPlay() -> void
 {
   Super::BeginPlay();
+  nextRegen = 10.f;
 }
 
 // Called every frame
 auto AMaze::Tick(float DeltaTime) -> void
 {
   Super::Tick(DeltaTime);
+  if (GetWorld()->GetTimeSeconds() > nextRegen)
+  {
+    nextRegen += 10.f;
+    regenMaze();
+  }
 }
 
 auto AMaze::OnConstruction(const FTransform &Transform) -> void
 {
   Super::OnConstruction(Transform);
+  regenMaze();
+}
+
+auto AMaze::regenMaze() -> void
+{
   wallTall->ClearInstances();
   wallShort->ClearInstances();
   cornerTall->ClearInstances();
@@ -65,7 +76,8 @@ auto AMaze::OnConstruction(const FTransform &Transform) -> void
           wallTall->AddInstance(
             FTransform(rot(0., 90., 0.), vec(x * 120. + 120., y / 2 * 120. + 10., 0.)));
         else
-          wallShort->AddInstance(FTransform(rot(0., 90., 0.), vec(x * 120. + 120., y / 2 * 120. + 10., 0.)));
+          wallShort->AddInstance(
+            FTransform(rot(0., 90., 0.), vec(x * 120. + 120., y / 2 * 120. + 10., 0.)));
       }
       else
       {
@@ -96,8 +108,7 @@ auto AMaze::OnConstruction(const FTransform &Transform) -> void
       wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(x * 120. + 10., 0., 0.)));
     if (!((x == sz - 1 && (startCorner == 2 || endCorner == 2)) ||
           (x == 0 && (startCorner == 3 || endCorner == 3))))
-      wallShort->AddInstance(
-        FTransform(rot(0., 0., 0.), vec(x * 120. + 10., sz * 120., 0.)));
+      wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(x * 120. + 10., sz * 120., 0.)));
   }
   for (auto y = 0; y < sz; ++y)
   {
@@ -129,10 +140,8 @@ auto AMaze::OnConstruction(const FTransform &Transform) -> void
       FTransform(rot(0., 90., 0.), vec((sz - 1) * 120., sz * 120. + 0 * 120. + 10., 0.)));
     wallShort->AddInstance(
       FTransform(rot(0., 90., 0.), vec((sz - 1) * 120., sz * 120. + 1 * 120. + 10., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 90., 0.), vec(sz * 120., sz * 120. + 0 * 120. + 10., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 90., 0.), vec(sz * 120., sz * 120. + 1 * 120. + 10., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 90., 0.), vec(sz * 120., sz * 120. + 0 * 120. + 10., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 90., 0.), vec(sz * 120., sz * 120. + 1 * 120. + 10., 0.)));
   }
   if (endCorner == 3)
   {
@@ -157,25 +166,17 @@ auto AMaze::OnConstruction(const FTransform &Transform) -> void
   }
   if (endCorner == 6)
   {
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120., sz * 120. - 0 * 120., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120., sz * 120. - 1 * 120., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120. + 120., sz * 120. - 0 * 120., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120. + 120., sz * 120. - 1 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120., sz * 120. - 0 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120., sz * 120. - 1 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120. + 120., sz * 120. - 0 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120. + 120., sz * 120. - 1 * 120., 0.)));
   }
   if (endCorner == 7)
   {
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120., 0 * 120. + 0 * 120., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120., 0 * 120. + 1 * 120., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120. + 120., 0 * 120. + 0 * 120., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120. + 120., 0 * 120. + 1 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120., 0 * 120. + 0 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120., 0 * 120. + 1 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120. + 120., 0 * 120. + 0 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120. + 120., 0 * 120. + 1 * 120., 0.)));
   }
   if (startCorner == 0)
   {
@@ -192,8 +193,7 @@ auto AMaze::OnConstruction(const FTransform &Transform) -> void
   {
     wallShort->AddInstance(
       FTransform(rot(0., 90., 0.), vec((sz - 1) * 120., sz * 120. + 0 * 120. + 10., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 90., 0.), vec(sz * 120., sz * 120. + 0 * 120. + 10., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 90., 0.), vec(sz * 120., sz * 120. + 0 * 120. + 10., 0.)));
   }
   if (startCorner == 3)
   {
@@ -213,16 +213,12 @@ auto AMaze::OnConstruction(const FTransform &Transform) -> void
   }
   if (startCorner == 6)
   {
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120., sz * 120. - 0 * 120., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120., sz * 120. - 1 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120., sz * 120. - 0 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120., sz * 120. - 1 * 120., 0.)));
   }
   if (startCorner == 7)
   {
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120., 0 * 120. + 0 * 120., 0.)));
-    wallShort->AddInstance(
-      FTransform(rot(0., 0., 0.), vec(sz * 120., 0 * 120. + 1 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120., 0 * 120. + 0 * 120., 0.)));
+    wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120., 0 * 120. + 1 * 120., 0.)));
   }
 }
