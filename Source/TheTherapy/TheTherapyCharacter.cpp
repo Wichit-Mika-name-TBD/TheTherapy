@@ -54,4 +54,16 @@ void ATheTherapyCharacter::Tick(float DeltaSeconds)
 auto ATheTherapyCharacter::BeginPlay() -> void
 {
   Super::BeginPlay();
+  heartsCount = 0;
+}
+
+auto ATheTherapyCharacter::addHeart() -> void
+{
+  LOG("add heart");
+  ++heartsCount;
+}
+
+auto ATheTherapyCharacter::getHeartsCount() -> int
+{
+  return heartsCount;
 }

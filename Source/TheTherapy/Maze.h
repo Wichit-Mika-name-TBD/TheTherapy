@@ -44,10 +44,12 @@ public:
   class UInstancedStaticMeshComponent *floor;
 
 private:
-  // Called when the game starts or when spawned
   auto BeginPlay() -> void final;
   auto OnConstruction(const FTransform &Transform) -> void final;
+  auto regenMaze() -> void;
 
   // Called every frame
   auto Tick(float DeltaTime) -> void final;
+
+  float nextRegen = 0.f;
 };

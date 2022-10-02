@@ -1,6 +1,7 @@
 // Copyright (c) 2022 Wichit & Mika (name TBD)
 
 #include "CubeMaze.h"
+#include "Heart.h"
 #include "Maze.h"
 #include "TheTherapyCharacter.h"
 #include <Components/BoxComponent.h>
@@ -49,6 +50,18 @@ void ACubeMaze::BeginPlay()
   angle = 0.f;
   updateSidesVisibility();
   updateSidesCollision();
+  for (auto i = 0; i < 6; ++i)
+  {
+    FActorSpawnParameters param;
+    param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    auto heart = GetWorld()->SpawnActor<AHeart>(AHeart::StaticClass(),
+                                                vec(120. * (rand() % sz) + 120. / 2., //
+                                                    120. * (rand() % sz) + 120. / 2., //
+                                                    15.),
+                                                rot(0., 0., 90.),
+                                                param);
+    heart->AttachToActor(sides[i], FAttachmentTransformRules::KeepRelativeTransform);
+  }
 }
 
 // Called every frame
@@ -292,9 +305,15 @@ void ACubeMaze::onOverlap(UPrimitiveComponent *HitComponent,
   auto idx = std::distance(std::begin(exitColliders), it);
   if (state == idx)
     return;
+
+  if (character->getHeartsCount() < idx + 1)
+  {
+    LOG("We need to collect a heart first");
+    return;
+  }
   state = idx;
   angle = 0.;
-  LOG(idx);
+  LOG("state:", state, "hearts:", character->getHeartsCount());
   updateSidesVisibility();
 }
 
