@@ -54,6 +54,7 @@ private:
   FTransform initialTransform;
 
   std::array<class UBoxComponent *, 6> exitColliders;
+  std::array<class AMobSpawner *, 6> mobSpawners;
 
   UFUNCTION()
   void onOverlap(UPrimitiveComponent *HitComponent,

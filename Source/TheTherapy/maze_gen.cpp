@@ -1,13 +1,12 @@
 // Copyright (c) 2022 Wichit & Mika (name TBD)
 
 #include "maze_gen.h"
-#include <QofL/log.h>
 #include <array>
 #include <iomanip>
 #include <sstream>
 #include <string>
 
-auto genMaze(int sz) -> std::vector<bool>
+auto genMaze(int sz, int rmFraction) -> std::vector<bool>
 {
   srand(time(nullptr));
   auto weights = std::vector<int>{};
@@ -54,7 +53,6 @@ auto genMaze(int sz) -> std::vector<bool>
     std::ostringstream l;
     for (auto x = 0; x < sz; ++x)
       l << std::setw(2) << state[x + y * sz].first;
-    LOG(l.str());
   }
 
   auto ret = std::vector<bool>{};
@@ -99,6 +97,9 @@ auto genMaze(int sz) -> std::vector<bool>
       }
     }
 
+  for (auto i = 0; i < (sz * sz * sz) * rmFraction / 100; ++i)
+    ret[rand() % sz + rand() % (sz * 2) * sz] = false;
+
   for (auto y = 0; y < 2 * sz - 1; ++y)
   {
     std::string l;
@@ -106,7 +107,6 @@ auto genMaze(int sz) -> std::vector<bool>
       l += " ";
     for (auto x = 0; x < sz - (y + 1) % 2; ++x)
       l += std::to_string(ret[x + y * sz]) + " ";
-    LOG(l);
   }
   return ret;
 }

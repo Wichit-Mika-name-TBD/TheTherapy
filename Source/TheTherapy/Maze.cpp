@@ -38,6 +38,7 @@ auto AMaze::BeginPlay() -> void
 {
   Super::BeginPlay();
   nextRegen = 10.f;
+  regenMaze();
 }
 
 // Called every frame
@@ -64,7 +65,7 @@ auto AMaze::regenMaze() -> void
   cornerTall->ClearInstances();
   cornerShort->ClearInstances();
   floor->ClearInstances();
-  auto maze = genMaze(sz);
+  auto maze = genMaze(sz, rmFraction);
   for (auto y = 0; y < 2 * sz - 1; ++y)
     for (auto x = 0; x < sz - (y + 1) % 2; ++x)
     {

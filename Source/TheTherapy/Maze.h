@@ -43,6 +43,9 @@ public:
   UPROPERTY(EditAnywhere)
   class UInstancedStaticMeshComponent *floor;
 
+  UPROPERTY(EditAnywhere)
+  int rmFraction = 10;
+
 private:
   auto BeginPlay() -> void final;
   auto OnConstruction(const FTransform &Transform) -> void final;

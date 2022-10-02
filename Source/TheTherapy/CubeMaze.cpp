@@ -3,6 +3,7 @@
 #include "CubeMaze.h"
 #include "Heart.h"
 #include "Maze.h"
+#include "MobSpawner.h"
 #include "TheTherapyCharacter.h"
 #include <Components/BoxComponent.h>
 #include <Components/InstancedStaticMeshComponent.h>
@@ -48,8 +49,6 @@ void ACubeMaze::BeginPlay()
   }
   state = -1;
   angle = 0.f;
-  updateSidesVisibility();
-  updateSidesCollision();
   for (auto i = 0; i < 6; ++i)
   {
     FActorSpawnParameters param;
@@ -62,6 +61,28 @@ void ACubeMaze::BeginPlay()
                                                 param);
     heart->AttachToActor(sides[i], FAttachmentTransformRules::KeepRelativeTransform);
   }
+  {
+    FActorSpawnParameters param;
+    param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+    int i = 0;
+    for (auto v : {
+           vec(120. * (sz - 1) + 120. / 2., -120. * 2 + 120. / 2., 0.),
+           vec(120. * 0. + 120. / 2., -120. * 2 + 120. / 2., 0.),
+           vec(120. * (sz - 1 + 2) + 120. / 2., 120. / 2., 0.),
+           vec(120. * 0. + 120. / 2., 120. * (sz - 1 + 2) + 120. / 2., 0.),
+           vec(120. * -2. + 120. / 2., 120. * (sz - 1) + 120. / 2., 0.),
+           vec(120. * (sz - 1) + 120. / 2., -120. * 2 + 120. / 2., 0.),
+         })
+    {
+      mobSpawners[i] =
+        GetWorld()->SpawnActor<AMobSpawner>(AMobSpawner::StaticClass(), v, rot(0., 0., 0.), param);
+      mobSpawners[i]->AttachToActor(sides[i], FAttachmentTransformRules::KeepRelativeTransform);
+      ++i;
+    }
+  }
+  updateSidesVisibility();
+  updateSidesCollision();
 }
 
 // Called every frame
@@ -79,11 +100,12 @@ void ACubeMaze::Tick(float DeltaTime)
   case 0: {
     const auto move1 = FTransform{vec(0., 0., 0.)};
     const auto move2 = FTransform{vec(0., 0., 0.)};
-    if (angle >= 90.)
+    if (angle > 90.)
     {
       angle = 90.;
       updateSidesCollision();
     }
+    else if (angle == 90.) {}
     else
       angle += K * DeltaTime;
     const auto r = FTransform{rot(0., 0., -angle)};
@@ -104,11 +126,12 @@ void ACubeMaze::Tick(float DeltaTime)
     {
       const auto move3 = FTransform{vec(0., 0., 120. * (4. + sz))};
       const auto move4 = FTransform{vec(0., 0., -120. * (4. + sz))};
-      if (angle >= 90.)
+      if (angle > 90.)
       {
         angle = 90.;
         updateSidesCollision();
       }
+      else if (angle == 90.) {}
       else
         angle += K * DeltaTime;
       const auto r = FTransform{rot(0., 0., -angle)};
@@ -140,11 +163,12 @@ void ACubeMaze::Tick(float DeltaTime)
     {
       const auto move3 = FTransform{vec(120. * (4. + sz), 0., 120. * (4. + sz))};
       const auto move4 = FTransform{vec(-120. * (4. + sz), 0., -120. * (4. + sz))};
-      if (angle >= 90.)
+      if (angle > 90.)
       {
         angle = 90.;
         updateSidesCollision();
       }
+      else if (angle == 90.) {}
       else
         angle += K * DeltaTime;
       const auto r = FTransform{rot(angle, 0., 0.)};
@@ -185,11 +209,12 @@ void ACubeMaze::Tick(float DeltaTime)
     {
       const auto move3 = FTransform{vec(120. * (4. + sz), 120. * (4. + sz), 0.)};
       const auto move4 = FTransform{vec(-120. * (4. + sz), -120. * (4. + sz), 0.)};
-      if (angle >= 90.)
+      if (angle > 90.)
       {
         angle = 90.;
         updateSidesCollision();
       }
+      else if (angle == 90.) {}
       else
         angle += K * DeltaTime;
       const auto r = FTransform{rot(0., -angle, 0.)};
@@ -239,11 +264,12 @@ void ACubeMaze::Tick(float DeltaTime)
     {
       const auto move3 = FTransform{vec(0., 120. * (4. + sz), 0.)};
       const auto move4 = FTransform{vec(0., -120. * (4. + sz), 0.)};
-      if (angle >= 90.)
+      if (angle > 90.)
       {
         angle = 90.;
         updateSidesCollision();
       }
+      else if (angle == 90.) {}
       else
         angle += K * DeltaTime;
       const auto r = FTransform{rot(0., -angle, 0.)};
@@ -311,6 +337,8 @@ void ACubeMaze::onOverlap(UPrimitiveComponent *HitComponent,
     LOG("We need to collect a heart first");
     return;
   }
+  if (state + 1 >= 0)
+    mobSpawners[state + 1]->despawn();
   state = idx;
   angle = 0.;
   LOG("state:", state, "hearts:", character->getHeartsCount());
@@ -370,4 +398,6 @@ auto ACubeMaze::updateSidesCollision() -> void
         mesh->SetCollisionProfileName(TEXT("NoCollision"));
     }
   }
+  if (state + 1 >= 0)
+    mobSpawners[state + 1]->spawn();
 }
