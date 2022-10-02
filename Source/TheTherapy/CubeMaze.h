@@ -26,6 +26,24 @@ public:
   UPROPERTY(EditAnywhere)
   TArray<class AMaze *> sides;
 
+  UPROPERTY(EditAnywhere)
+  class UBoxComponent *exitCollider0;
+
+  UPROPERTY(EditAnywhere)
+  class UBoxComponent *exitCollider1;
+
+  UPROPERTY(EditAnywhere)
+  class UBoxComponent *exitCollider2;
+
+  UPROPERTY(EditAnywhere)
+  class UBoxComponent *exitCollider3;
+
+  UPROPERTY(EditAnywhere)
+  class UBoxComponent *exitCollider4;
+
+  UPROPERTY(EditAnywhere)
+  class UBoxComponent *exitCollider5;
+
 private:
   auto BeginPlay() -> void final;
   auto OnConstruction(const FTransform &Transform) -> void final;

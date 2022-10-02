@@ -12,12 +12,18 @@
 ACubeMaze::ACubeMaze() : root(CreateDefaultSubobject<USceneComponent>("root"))
 {
   SetRootComponent(root);
-  exitColliders[0] = CreateDefaultSubobject<UBoxComponent>("exit0");
-  exitColliders[1] = CreateDefaultSubobject<UBoxComponent>("exit1");
-  exitColliders[2] = CreateDefaultSubobject<UBoxComponent>("exit2");
-  exitColliders[3] = CreateDefaultSubobject<UBoxComponent>("exit3");
-  exitColliders[4] = CreateDefaultSubobject<UBoxComponent>("exit4");
-  exitColliders[5] = CreateDefaultSubobject<UBoxComponent>("exit5");
+  exitCollider0 = CreateDefaultSubobject<UBoxComponent>("exit0");
+  exitCollider1 = CreateDefaultSubobject<UBoxComponent>("exit1");
+  exitCollider2 = CreateDefaultSubobject<UBoxComponent>("exit2");
+  exitCollider3 = CreateDefaultSubobject<UBoxComponent>("exit3");
+  exitCollider4 = CreateDefaultSubobject<UBoxComponent>("exit4");
+  exitCollider5 = CreateDefaultSubobject<UBoxComponent>("exit5");
+  exitColliders[0] = exitCollider0;
+  exitColliders[1] = exitCollider1;
+  exitColliders[2] = exitCollider2;
+  exitColliders[3] = exitCollider3;
+  exitColliders[4] = exitCollider4;
+  exitColliders[5] = exitCollider5;
   for (auto &e : exitColliders)
   {
     e->SetMobility(EComponentMobility::Movable);
