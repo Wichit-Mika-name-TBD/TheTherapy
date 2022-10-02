@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
+#include "Templates/SubclassOf.h"
 #include "TheTherapyPlayerController.generated.h"
 
 /** Forward declaration to improve compiling times */
@@ -13,38 +13,40 @@ class UNiagaraSystem;
 UCLASS()
 class ATheTherapyPlayerController : public APlayerController
 {
-	GENERATED_BODY()
+  GENERATED_BODY()
 
 public:
-	ATheTherapyPlayerController();
+  ATheTherapyPlayerController();
 
-	/** Time Threshold to know if it was a short press */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	float ShortPressThreshold;
+  /** Time Threshold to know if it was a short press */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+  float ShortPressThreshold;
 
-	/** FX Class that we will spawn when clicking */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UNiagaraSystem* FXCursor;
+  /** FX Class that we will spawn when clicking */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+  UNiagaraSystem *FXCursor;
 
 protected:
-	/** True if the controlled character should navigate to the mouse cursor. */
-	uint32 bMoveToMouseCursor : 1;
+  /** True if the controlled character should navigate to the mouse cursor. */
+  uint32 bMoveToMouseCursor : 1;
 
-	// Begin PlayerController interface
-	virtual void PlayerTick(float DeltaTime) override;
-	virtual void SetupInputComponent() override;
-	// End PlayerController interface
+  // Begin PlayerController interface
+  virtual void PlayerTick(float DeltaTime) override;
+  virtual void SetupInputComponent() override;
+  // End PlayerController interface
 
-	/** Input handlers for SetDestination action. */
-	void OnSetDestinationPressed();
-	void OnSetDestinationReleased();
-	void OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location);
-	void OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location);
+  /** Input handlers for SetDestination action. */
+  void OnSetDestinationPressed();
+  void OnSetDestinationReleased();
+  void OnMouseMotion(float val);
+  void OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location);
+  void OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location);
+  auto OnStartCameraOrbit() -> void;
+  auto OnFinishCameraOrbit() -> void;
 
 private:
-	bool bInputPressed; // Input is bring pressed
-	bool bIsTouch; // Is it a touch device
-	float FollowTime; // For how long it has been pressed
+  bool bInputPressed; // Input is bring pressed
+  bool bIsTouch;      // Is it a touch device
+  float FollowTime;   // For how long it has been pressed
+  bool isCameraOrbiting;
 };
-
-
