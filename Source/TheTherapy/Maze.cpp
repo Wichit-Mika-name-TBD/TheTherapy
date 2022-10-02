@@ -223,3 +223,8 @@ auto AMaze::regenMaze() -> void
     wallShort->AddInstance(FTransform(rot(0., 0., 0.), vec(sz * 120., 0 * 120. + 1 * 120., 0.)));
   }
 }
+
+auto AMaze::resetNextRegen() -> void
+{
+  nextRegen = GetWorld()->GetTimeSeconds() + 10.f;
+}

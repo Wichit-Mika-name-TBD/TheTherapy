@@ -46,6 +46,8 @@ public:
   UPROPERTY(EditAnywhere)
   int rmFraction = 10;
 
+  auto resetNextRegen() -> void;
+
 private:
   auto BeginPlay() -> void final;
   auto OnConstruction(const FTransform &Transform) -> void final;

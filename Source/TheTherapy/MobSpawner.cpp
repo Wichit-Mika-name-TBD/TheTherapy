@@ -30,6 +30,7 @@ auto AMobSpawner::despawn() -> void
     mob->Destroy();
   }
   mob = nullptr;
+  spawnTime = -1.f;
 }
 
 auto AMobSpawner::BeginPlay() -> void

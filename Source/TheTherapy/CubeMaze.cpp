@@ -337,7 +337,7 @@ void ACubeMaze::onOverlap(UPrimitiveComponent *HitComponent,
     LOG("We need to collect a heart first");
     return;
   }
-  if (state + 1 >= 0)
+  if (state + 1 >= 0 && state + 1 < 6)
     mobSpawners[state + 1]->despawn();
   state = idx;
   angle = 0.;
@@ -398,6 +398,8 @@ auto ACubeMaze::updateSidesCollision() -> void
         mesh->SetCollisionProfileName(TEXT("NoCollision"));
     }
   }
-  if (state + 1 >= 0)
+  if (state + 1 >= 0 && state + 1 < 6)
     mobSpawners[state + 1]->spawn();
+  for (auto side : sides)
+    side->resetNextRegen();
 }
