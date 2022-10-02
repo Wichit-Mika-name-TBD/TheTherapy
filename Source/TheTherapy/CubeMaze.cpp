@@ -1,8 +1,12 @@
 // Copyright (c) 2022 Wichit & Mika (name TBD)
 
 #include "CubeMaze.h"
+#include "Maze.h"
+#include "TheTherapyCharacter.h"
 #include <Components/BoxComponent.h>
+#include <Components/InstancedStaticMeshComponent.h>
 #include <QofL/abbr.h>
+#include <QofL/log.h>
 
 // Sets default values
 ACubeMaze::ACubeMaze() : root(CreateDefaultSubobject<USceneComponent>("root"))
@@ -31,6 +35,14 @@ void ACubeMaze::BeginPlay()
 {
   Super::BeginPlay();
   initialTransform = GetActorTransform();
+  for (auto &e : exitColliders)
+  {
+    e->OnComponentBeginOverlap.AddDynamic(this, &ACubeMaze::onOverlap);
+  }
+  state = -1;
+  angle = 0.f;
+  updateSidesVisibility();
+  updateSidesCollision();
 }
 
 // Called every frame
@@ -39,16 +51,193 @@ void ACubeMaze::Tick(float DeltaTime)
   Super::Tick(DeltaTime);
   auto time = GetWorld()->GetTimeSeconds();
 
-  //  const auto move1 = FTransform{vec(120.0 * 12, 0., 0.)};
-  //  const auto move2 = FTransform{vec(-120.0 * 12, 0., 0.)};
-  //  const auto r = FTransform{rot(-50 * time, 0., 0.)};
-  //
-  //  auto m = FTransform{};
-  //  FTransform::Multiply(&m, &move1, &initialTransform);
-  //  auto n = FTransform{};
-  //  FTransform::Multiply(&n, &r, &m);
-  //  FTransform::Multiply(&m, &move2, &n);
-  //  SetActorTransform(m);
+  const auto K = 20.;
+  auto m = FTransform{};
+  auto n = FTransform{};
+  switch (state)
+  {
+  case -1: m = initialTransform; break;
+  case 0: {
+    const auto move1 = FTransform{vec(0., 0., 0.)};
+    const auto move2 = FTransform{vec(0., 0., 0.)};
+    if (angle >= 90.)
+    {
+      angle = 90.;
+      updateSidesCollision();
+    }
+    else
+      angle += K * DeltaTime;
+    const auto r = FTransform{rot(0., 0., -angle)};
+    FTransform::Multiply(&m, &move1, &initialTransform);
+    FTransform::Multiply(&n, &r, &m);
+    FTransform::Multiply(&m, &move2, &n);
+    break;
+  }
+  case 1: {
+    {
+      const auto move1 = FTransform{vec(0., 0., 0.)};
+      const auto move2 = FTransform{vec(0., 0., 0.)};
+      const auto r = FTransform{rot(0., 0., -90.)};
+      FTransform::Multiply(&m, &move1, &initialTransform);
+      FTransform::Multiply(&n, &r, &m);
+      FTransform::Multiply(&m, &move2, &n);
+    }
+    {
+      const auto move3 = FTransform{vec(0., 0., 120. * (4. + sz))};
+      const auto move4 = FTransform{vec(0., 0., -120. * (4. + sz))};
+      if (angle >= 90.)
+      {
+        angle = 90.;
+        updateSidesCollision();
+      }
+      else
+        angle += K * DeltaTime;
+      const auto r = FTransform{rot(0., 0., -angle)};
+      FTransform::Multiply(&n, &move3, &m);
+      FTransform::Multiply(&m, &r, &n);
+      FTransform::Multiply(&n, &move4, &m);
+      m = n;
+    }
+    break;
+  }
+  case 2: {
+    {
+      const auto move1 = FTransform{vec(0., 0., 0.)};
+      const auto move2 = FTransform{vec(0., 0., 0.)};
+      const auto r = FTransform{rot(0., 0., -90.)};
+      FTransform::Multiply(&m, &move1, &initialTransform);
+      FTransform::Multiply(&n, &r, &m);
+      FTransform::Multiply(&m, &move2, &n);
+    }
+    {
+      const auto move3 = FTransform{vec(0., 0., 120. * (4. + sz))};
+      const auto move4 = FTransform{vec(0., 0., -120. * (4. + sz))};
+      const auto r = FTransform{rot(0., 0., -90.)};
+      FTransform::Multiply(&n, &move3, &m);
+      FTransform::Multiply(&m, &r, &n);
+      FTransform::Multiply(&n, &move4, &m);
+      m = n;
+    }
+    {
+      const auto move3 = FTransform{vec(120. * (4. + sz), 0., 120. * (4. + sz))};
+      const auto move4 = FTransform{vec(-120. * (4. + sz), 0., -120. * (4. + sz))};
+      if (angle >= 90.)
+      {
+        angle = 90.;
+        updateSidesCollision();
+      }
+      else
+        angle += K * DeltaTime;
+      const auto r = FTransform{rot(angle, 0., 0.)};
+      FTransform::Multiply(&n, &move3, &m);
+      FTransform::Multiply(&m, &r, &n);
+      FTransform::Multiply(&n, &move4, &m);
+      m = n;
+    }
+    break;
+  }
+  case 3: {
+    {
+      const auto move1 = FTransform{vec(0., 0., 0.)};
+      const auto move2 = FTransform{vec(0., 0., 0.)};
+      const auto r = FTransform{rot(0., 0., -90.)};
+      FTransform::Multiply(&m, &move1, &initialTransform);
+      FTransform::Multiply(&n, &r, &m);
+      FTransform::Multiply(&m, &move2, &n);
+    }
+    {
+      const auto move3 = FTransform{vec(0., 0., 120. * (4. + sz))};
+      const auto move4 = FTransform{vec(0., 0., -120. * (4. + sz))};
+      const auto r = FTransform{rot(0., 0., -90.)};
+      FTransform::Multiply(&n, &move3, &m);
+      FTransform::Multiply(&m, &r, &n);
+      FTransform::Multiply(&n, &move4, &m);
+      m = n;
+    }
+    {
+      const auto move3 = FTransform{vec(120. * (4. + sz), 0., 120. * (4. + sz))};
+      const auto move4 = FTransform{vec(-120. * (4. + sz), 0., -120. * (4. + sz))};
+      const auto r = FTransform{rot(90., 0., 0.)};
+      FTransform::Multiply(&n, &move3, &m);
+      FTransform::Multiply(&m, &r, &n);
+      FTransform::Multiply(&n, &move4, &m);
+      m = n;
+    }
+    {
+      const auto move3 = FTransform{vec(120. * (4. + sz), 120. * (4. + sz), 0.)};
+      const auto move4 = FTransform{vec(-120. * (4. + sz), -120. * (4. + sz), 0.)};
+      if (angle >= 90.)
+      {
+        angle = 90.;
+        updateSidesCollision();
+      }
+      else
+        angle += K * DeltaTime;
+      const auto r = FTransform{rot(0., -angle, 0.)};
+      FTransform::Multiply(&n, &move3, &m);
+      FTransform::Multiply(&m, &r, &n);
+      FTransform::Multiply(&n, &move4, &m);
+      m = n;
+    }
+    break;
+  }
+  case 4: {
+    {
+      const auto move1 = FTransform{vec(0., 0., 0.)};
+      const auto move2 = FTransform{vec(0., 0., 0.)};
+      const auto r = FTransform{rot(0., 0., -90.)};
+      FTransform::Multiply(&m, &move1, &initialTransform);
+      FTransform::Multiply(&n, &r, &m);
+      FTransform::Multiply(&m, &move2, &n);
+    }
+    {
+      const auto move3 = FTransform{vec(0., 0., 120. * (4. + sz))};
+      const auto move4 = FTransform{vec(0., 0., -120. * (4. + sz))};
+      const auto r = FTransform{rot(0., 0., -90.)};
+      FTransform::Multiply(&n, &move3, &m);
+      FTransform::Multiply(&m, &r, &n);
+      FTransform::Multiply(&n, &move4, &m);
+      m = n;
+    }
+    {
+      const auto move3 = FTransform{vec(120. * (4. + sz), 0., 120. * (4. + sz))};
+      const auto move4 = FTransform{vec(-120. * (4. + sz), 0., -120. * (4. + sz))};
+      const auto r = FTransform{rot(90., 0., 0.)};
+      FTransform::Multiply(&n, &move3, &m);
+      FTransform::Multiply(&m, &r, &n);
+      FTransform::Multiply(&n, &move4, &m);
+      m = n;
+    }
+    {
+      const auto move3 = FTransform{vec(120. * (4. + sz), 120. * (4. + sz), 0.)};
+      const auto move4 = FTransform{vec(-120. * (4. + sz), -120. * (4. + sz), 0.)};
+      const auto r = FTransform{rot(0., -90., 0.)};
+      FTransform::Multiply(&n, &move3, &m);
+      FTransform::Multiply(&m, &r, &n);
+      FTransform::Multiply(&n, &move4, &m);
+      m = n;
+    }
+    {
+      const auto move3 = FTransform{vec(0., 120. * (4. + sz), 0.)};
+      const auto move4 = FTransform{vec(0., -120. * (4. + sz), 0.)};
+      if (angle >= 90.)
+      {
+        angle = 90.;
+        updateSidesCollision();
+      }
+      else
+        angle += K * DeltaTime;
+      const auto r = FTransform{rot(0., -angle, 0.)};
+      FTransform::Multiply(&n, &move3, &m);
+      FTransform::Multiply(&m, &r, &n);
+      FTransform::Multiply(&n, &move4, &m);
+      m = n;
+    }
+    break;
+  }
+  }
+
+  SetActorTransform(m);
 }
 
 auto ACubeMaze::OnConstruction(const FTransform &Transform) -> void
@@ -78,4 +267,82 @@ auto ACubeMaze::OnConstruction(const FTransform &Transform) -> void
          vec(120. / 2., //
              120. / 2., //
              120. + 120. * 3. / 2.));
+}
+
+void ACubeMaze::onOverlap(UPrimitiveComponent *HitComponent,
+                          AActor *OtherActor,
+                          UPrimitiveComponent *OtherComp,
+                          int n,
+                          bool b,
+                          const FHitResult &Hit)
+{
+  auto character = Cast<ATheTherapyCharacter>(OtherActor);
+  if (!character)
+    return;
+  LOG("onOverlap");
+  auto it = std::find(std::begin(exitColliders), std::end(exitColliders), HitComponent);
+  if (it == std::end(exitColliders))
+    return;
+  auto idx = std::distance(std::begin(exitColliders), it);
+  if (state == idx)
+    return;
+  state = idx;
+  angle = 0.;
+  LOG(idx);
+  updateSidesVisibility();
+}
+
+auto ACubeMaze::updateSidesVisibility() -> void
+{
+  for (auto i = 0; i < 6; ++i)
+    sides[i]->SetActorHiddenInGame(false);
+  switch (state)
+  {
+  case -1:
+    sides[2]->SetActorHiddenInGame(true);
+    sides[4]->SetActorHiddenInGame(true);
+    break;
+  case 0:
+    sides[4]->SetActorHiddenInGame(true);
+    sides[5]->SetActorHiddenInGame(true);
+    break;
+  case 1:
+    sides[0]->SetActorHiddenInGame(true);
+    sides[5]->SetActorHiddenInGame(true);
+    break;
+  case 2:
+    sides[1]->SetActorHiddenInGame(true);
+    sides[5]->SetActorHiddenInGame(true);
+    break;
+  case 3:
+    sides[1]->SetActorHiddenInGame(true);
+    sides[0]->SetActorHiddenInGame(true);
+    break;
+  case 4:
+    sides[0]->SetActorHiddenInGame(true);
+    sides[3]->SetActorHiddenInGame(true);
+    break;
+  case 5: break;
+  }
+}
+
+auto ACubeMaze::updateSidesCollision() -> void
+{
+  for (auto i = 0; i < 6; ++i)
+  {
+    auto side = sides[i];
+    auto isVisible = !side->IsHidden();
+    TArray<UActorComponent *> comps;
+    side->GetComponents(UInstancedStaticMeshComponent::StaticClass(), comps, true);
+    for (auto comp : comps)
+    {
+      auto mesh = Cast<UInstancedStaticMeshComponent>(comp);
+      if (!mesh)
+        continue;
+      if (isVisible)
+        mesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
+      else
+        mesh->SetCollisionProfileName(TEXT("NoCollision"));
+    }
+  }
 }

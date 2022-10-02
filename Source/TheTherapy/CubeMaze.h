@@ -23,12 +23,28 @@ public:
   UPROPERTY(EditAnywhere)
   int sz = 8;
 
+  UPROPERTY(EditAnywhere)
+  TArray<class AMaze *> sides;
+
 private:
   auto BeginPlay() -> void final;
   auto OnConstruction(const FTransform &Transform) -> void final;
   auto Tick(float DeltaTime) -> void final;
+  auto updateSidesVisibility() -> void;
+  auto updateSidesCollision() -> void;
 
   FTransform initialTransform;
 
   std::array<class UBoxComponent *, 6> exitColliders;
+
+  UFUNCTION()
+  void onOverlap(UPrimitiveComponent *HitComponent,
+                 AActor *OtherActor,
+                 UPrimitiveComponent *OtherComp,
+                 int n,
+                 bool b,
+                 const FHitResult &Hit);
+
+  int state = -1;
+  float angle = 0.f;
 };
