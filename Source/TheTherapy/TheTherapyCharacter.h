@@ -7,16 +7,15 @@
 #include "TheTherapyCharacter.generated.h"
 
 UCLASS(Blueprintable)
-class ATheTherapyCharacter : public ACharacter
+class ATheTherapyCharacter final : public ACharacter
 {
   GENERATED_BODY()
 
 public:
   ATheTherapyCharacter();
 
-  // Called every frame.
-  virtual void Tick(float DeltaSeconds) override;
-  auto BeginPlay() -> void final;
+  auto addHeart() -> void;
+  auto getHeartsCount() -> int;
 
   /** Returns TopDownCameraComponent subobject **/
   FORCEINLINE class UCameraComponent *GetTopDownCameraComponent() const
@@ -26,10 +25,10 @@ public:
   /** Returns CameraBoom subobject **/
   FORCEINLINE class USpringArmComponent *GetCameraBoom() const { return CameraBoom; }
 
-  auto addHeart() -> void;
-  auto getHeartsCount() -> int;
-
 private:
+  auto BeginPlay() -> void final;
+  auto Tick(float DeltaSeconds) -> void final;
+
   /** Top down camera */
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
   class UCameraComponent *TopDownCameraComponent;

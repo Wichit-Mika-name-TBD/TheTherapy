@@ -3,4 +3,4 @@
 #pragma once
 #include <vector>
 
-auto genMaze(int sz) -> std::vector<bool>;
+auto genMaze(int sz, int rmFraction) -> std::vector<bool>;
