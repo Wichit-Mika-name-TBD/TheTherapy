@@ -112,7 +112,9 @@ void ACubeMaze::Tick(float DeltaTime)
   auto n = FTransform{};
   switch (state)
   {
-  case -1: m = initialTransform; break;
+  case -1: m = initialTransform;
+    angle = 90.;
+    break;
   case 0: {
     const auto move1 = FTransform{vec(0., 0., 0.)};
     const auto move2 = FTransform{vec(0., 0., 0.)};
