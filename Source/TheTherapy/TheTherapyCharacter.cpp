@@ -8,9 +8,13 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "HudUi.h"
 #include "Materials/Material.h"
+#include "PrjHud.h"
 #include "UObject/ConstructorHelpers.h"
 #include <Components/PointLightComponent.h>
+#include <GameFramework/PlayerController.h>
+#include <QofL/check_ret.h>
 #include <QofL/log.h>
 
 ATheTherapyCharacter::ATheTherapyCharacter()
@@ -64,6 +68,11 @@ auto ATheTherapyCharacter::addHeart() -> void
 {
   LOG("add heart");
   ++heartsCount;
+  auto hud = Cast<APlayerController>(GetController())->GetHUD<APrjHud>();
+  CHECK_RET(hud);
+  auto hudUi = hud->hudUi;
+  CHECK_RET(hudUi);
+  hudUi->setHearts(heartsCount);
 }
 
 auto ATheTherapyCharacter::getHeartsCount() -> int

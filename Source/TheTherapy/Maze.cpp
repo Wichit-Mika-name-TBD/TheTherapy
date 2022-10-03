@@ -228,3 +228,8 @@ auto AMaze::resetNextRegen() -> void
 {
   nextRegen = GetWorld()->GetTimeSeconds() + 10.f;
 }
+
+auto AMaze::getTime() const -> float
+{
+  return nextRegen - GetWorld()->GetTimeSeconds();
+}
