@@ -71,6 +71,7 @@ auto ATheTherapyCharacter::BeginPlay() -> void
   Super::BeginPlay();
   heartsCount = 0;
   m_isAlive = true;
+  m_isWin = false;
   OnActorHit.AddDynamic(this, &ATheTherapyCharacter::onHit);
 }
 
@@ -114,7 +115,20 @@ void ATheTherapyCharacter::onHit(AActor *self, AActor *other, FVector imp, const
     return;
   if (!m_isAlive)
     return;
+  if (m_isWin)
+    return;
   LOG("died");
   m_isAlive = false;
   UGameplayStatics::PlaySoundAtLocation(GetWorld(), deathSnd, getLoc(this));
+}
+
+auto ATheTherapyCharacter::won() -> void
+{
+  LOG("Level is cleared");
+  m_isWin = true;
+}
+
+bool ATheTherapyCharacter::isWin() const
+{
+  return m_isWin;
 }

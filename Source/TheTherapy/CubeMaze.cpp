@@ -21,7 +21,8 @@
 ACubeMaze::ACubeMaze()
   : root(CreateDefaultSubobject<USceneComponent>("root")),
     mazeRegenSnd(OBJ_FINDER(SoundCue, "SFX", "SND_MazeRegen_Cue")),
-    cubeRotationSnd(OBJ_FINDER(SoundCue, "SFX", "SND_CubeRotation_Cue"))
+    cubeRotationSnd(OBJ_FINDER(SoundCue, "SFX", "SND_CubeRotation_Cue")),
+    winSnd(OBJ_FINDER(SoundCue, "SFX", "SND_Positive_Cue"))
 {
   SetRootComponent(root);
   exitCollider0 = CreateDefaultSubobject<UBoxComponent>("exit0");
@@ -98,6 +99,11 @@ void ACubeMaze::BeginPlay()
   nextRegen = 10.f;
   for (auto side : sides)
     side->regenMaze();
+  auto hud = Cast<APlayerController>(GetWorld()->GetFirstPlayerController())->GetHUD<APrjHud>();
+  CHECK_RET(hud);
+  auto hudUi = hud->hudUi;
+  CHECK_RET(hudUi);
+  hudUi->nextLevel = nextLevel;
 }
 
 // Called every frame
@@ -112,7 +118,8 @@ void ACubeMaze::Tick(float DeltaTime)
   auto n = FTransform{};
   switch (state)
   {
-  case -1: m = initialTransform;
+  case -1:
+    m = initialTransform;
     angle = 90.;
     break;
   case 0: {
@@ -395,6 +402,18 @@ void ACubeMaze::onOverlap(UPrimitiveComponent *HitComponent,
   }
   if (state + 1 >= 0 && state + 1 < 6)
     mobSpawners[state + 1]->despawn();
+
+  if (state == 4)
+  {
+    UGameplayStatics::PlaySound2D(GetWorld(), winSnd);
+    auto controller = GetWorld()->GetFirstPlayerController();
+    CHECK_RET(controller);
+    auto player = Cast<ATheTherapyCharacter>(controller->GetPawnOrSpectator());
+    CHECK_RET(player);
+    player->won();
+    return;
+  }
+
   state = idx;
   angle = 0.;
   LOG("state:", state, "hearts:", character->getHeartsCount());

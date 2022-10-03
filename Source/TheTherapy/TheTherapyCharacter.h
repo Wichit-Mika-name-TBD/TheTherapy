@@ -17,6 +17,7 @@ public:
   auto addHeart() -> void;
   auto getHeartsCount() -> int;
   auto setDistanceToTheGoal(float) -> void;
+  auto won() -> void;
 
   /** Returns TopDownCameraComponent subobject **/
   FORCEINLINE class UCameraComponent *GetTopDownCameraComponent() const
@@ -31,6 +32,9 @@ public:
 
   UFUNCTION(BlueprintCallable)
   bool isAlive() const;
+
+  UFUNCTION(BlueprintCallable)
+  bool isWin() const;
 
 private:
   auto BeginPlay() -> void final;
@@ -56,4 +60,6 @@ private:
   class USoundCue *deathSnd;
 
   bool m_isAlive;
+  bool m_isWin;
 };
+

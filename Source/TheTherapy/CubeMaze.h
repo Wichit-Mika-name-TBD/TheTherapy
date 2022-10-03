@@ -44,6 +44,9 @@ public:
   UPROPERTY(EditAnywhere)
   class UBoxComponent *exitCollider5;
 
+  UPROPERTY(EditAnywhere)
+  FName nextLevel;
+
 private:
   auto BeginPlay() -> void final;
   auto OnConstruction(const FTransform &Transform) -> void final;
@@ -75,4 +78,5 @@ private:
   auto getTime() const -> float;
   float nextRegen = 0.f;
   class USoundCue *cubeRotationSnd;
+  class USoundCue *winSnd;
 };

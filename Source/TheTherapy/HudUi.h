@@ -15,4 +15,7 @@ public:
   auto setup() -> void;
   auto setHearts(int) -> void;
   auto setTime(float) -> void;
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly)
+  FName nextLevel;
 };
