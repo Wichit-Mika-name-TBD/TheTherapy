@@ -47,6 +47,7 @@ public:
   int rmFraction = 10;
 
   auto resetNextRegen() -> void;
+  auto getTime() const -> float;
 
 private:
   auto BeginPlay() -> void final;

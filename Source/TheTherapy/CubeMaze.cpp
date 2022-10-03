@@ -2,11 +2,14 @@
 
 #include "CubeMaze.h"
 #include "Heart.h"
+#include "HudUi.h"
 #include "Maze.h"
 #include "MobSpawner.h"
+#include "PrjHud.h"
 #include "TheTherapyCharacter.h"
 #include <Components/BoxComponent.h>
 #include <Components/InstancedStaticMeshComponent.h>
+#include <GameFramework/PlayerController.h>
 #include <QofL/abbr.h>
 #include <QofL/check_ret.h>
 #include <QofL/log.h>
@@ -308,6 +311,14 @@ void ACubeMaze::Tick(float DeltaTime)
       player->setDistanceToTheGoal(100.f);
     }
   }
+  auto hud = Cast<APlayerController>(GetWorld()->GetFirstPlayerController())->GetHUD<APrjHud>();
+  CHECK_RET(hud);
+  auto hudUi = hud->hudUi;
+  CHECK_RET(hudUi);
+  if (state + 1 >= 0 && state + 1 < 6)
+    hudUi->setTime(sides[state + 1]->getTime());
+  else
+    hudUi->setTime(0.f);
 }
 
 auto ACubeMaze::OnConstruction(const FTransform &Transform) -> void
