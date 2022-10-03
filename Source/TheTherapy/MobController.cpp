@@ -19,6 +19,5 @@ auto AMobController::Tick(float dt) -> void
   CHECK_RET(controller);
   auto player = controller->GetPawnOrSpectator();
   CHECK_RET(player);
-  LOG("Start move");
   MoveToActor(player, 50., true, true, false, nullptr, true);
 }
