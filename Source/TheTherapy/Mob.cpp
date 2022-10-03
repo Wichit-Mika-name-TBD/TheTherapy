@@ -3,6 +3,8 @@
 #include "Mob.h"
 #include <AIController.h>
 #include <Components/CapsuleComponent.h>
+#include <QofL/abbr.h>
+#include <QofL/check_ret.h>
 #include <QofL/class_finder.h>
 
 // Sets default values
@@ -32,4 +34,15 @@ void AMob::Tick(float DeltaTime)
 void AMob::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 {
   Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+bool AMob::isAttacking() const
+{
+  auto controller = GetWorld()->GetFirstPlayerController();
+  CHECK_RET(controller, false);
+  auto player = controller->GetPawnOrSpectator();
+  CHECK_RET(player, false);
+
+  auto dist = FVector::Distance(GetActorLocation(), getLoc(player));
+  return dist < 200.;
 }

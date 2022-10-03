@@ -55,6 +55,7 @@ private:
 
   std::array<class UBoxComponent *, 6> exitColliders;
   std::array<class AMobSpawner *, 6> mobSpawners;
+  std::array<class AHeart *, 6> hearts;
 
   UFUNCTION()
   void onOverlap(UPrimitiveComponent *HitComponent,
@@ -63,6 +64,9 @@ private:
                  int n,
                  bool b,
                  const FHitResult &Hit);
+
+  UFUNCTION()
+  void onHeartDestroyed(AActor *heart);
 
   int state = -1;
   float angle = 0.f;

@@ -14,6 +14,9 @@ class THETHERAPY_API AMob final : public ACharacter
 public:
   AMob();
 
+  UFUNCTION(BlueprintCallable)
+  bool isAttacking() const;
+
 private:
   auto BeginPlay() -> void final;
   auto Tick(float DeltaTime) -> void final;

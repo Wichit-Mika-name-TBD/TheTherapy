@@ -10,9 +10,11 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "UObject/ConstructorHelpers.h"
+#include <Components/PointLightComponent.h>
 #include <QofL/log.h>
 
 ATheTherapyCharacter::ATheTherapyCharacter()
+  : light(CreateDefaultSubobject<UPointLightComponent>(TEXT("light")))
 {
   // Set size for player capsule
   GetCapsuleComponent()->InitCapsuleSize(21.f, 96.0f);
@@ -40,6 +42,7 @@ ATheTherapyCharacter::ATheTherapyCharacter()
   TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
   TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
   TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+  light->SetupAttachment(RootComponent);
 
   // Activate ticking in order to update the cursor every frame.
   PrimaryActorTick.bCanEverTick = true;
@@ -66,4 +69,10 @@ auto ATheTherapyCharacter::addHeart() -> void
 auto ATheTherapyCharacter::getHeartsCount() -> int
 {
   return heartsCount;
+}
+
+auto ATheTherapyCharacter::setDistanceToTheGoal(float val) -> void
+{
+  auto l = log(val) * .75f - 3.5f;
+  light->SetLightColor(FLinearColor{l, 1.f - l, 0.f});
 }

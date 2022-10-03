@@ -18,7 +18,7 @@ AMobSpawner::AMobSpawner() : mobClass(CLASS_FINDER(AMob, "BP", "BP_Mob"))
 
 auto AMobSpawner::spawn() -> void
 {
-  spawnTime = GetWorld()->GetTimeSeconds() + 10.f;
+  spawnTime = GetWorld()->GetTimeSeconds() + 20.f;
   LOG("requested to spawn mob");
 }
 
@@ -30,6 +30,7 @@ auto AMobSpawner::despawn() -> void
     mob->Destroy();
   }
   mob = nullptr;
+  spawnTime = -1.f;
 }
 
 auto AMobSpawner::BeginPlay() -> void
