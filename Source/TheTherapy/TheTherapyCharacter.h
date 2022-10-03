@@ -16,6 +16,7 @@ public:
 
   auto addHeart() -> void;
   auto getHeartsCount() -> int;
+  auto setDistanceToTheGoal(float) -> void;
 
   /** Returns TopDownCameraComponent subobject **/
   FORCEINLINE class UCameraComponent *GetTopDownCameraComponent() const
@@ -36,6 +37,9 @@ private:
   /** Camera boom positioning the camera above the character */
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
   class USpringArmComponent *CameraBoom;
+
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Light, meta = (AllowPrivateAccess = "true"))
+  class UPointLightComponent *light;
 
   int heartsCount = 0;
 };

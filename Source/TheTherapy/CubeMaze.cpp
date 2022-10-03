@@ -8,6 +8,7 @@
 #include <Components/BoxComponent.h>
 #include <Components/InstancedStaticMeshComponent.h>
 #include <QofL/abbr.h>
+#include <QofL/check_ret.h>
 #include <QofL/log.h>
 
 // Sets default values
@@ -60,6 +61,8 @@ void ACubeMaze::BeginPlay()
                                                 rot(0., 0., 90.),
                                                 param);
     heart->AttachToActor(sides[i], FAttachmentTransformRules::KeepRelativeTransform);
+    heart->OnDestroyed.AddDynamic(this, &ACubeMaze::onHeartDestroyed);
+    hearts[i] = heart;
   }
   {
     FActorSpawnParameters param;
@@ -281,8 +284,30 @@ void ACubeMaze::Tick(float DeltaTime)
     break;
   }
   }
-
   SetActorTransform(m);
+
+  {
+    auto controller = GetWorld()->GetFirstPlayerController();
+    CHECK_RET(controller);
+    auto player = Cast<ATheTherapyCharacter>(controller->GetPawnOrSpectator());
+    CHECK_RET(player);
+
+    if (state + 1 >= 0 && state + 1 < 6)
+    {
+      if (auto heart = hearts[state + 1])
+      {
+        player->setDistanceToTheGoal(FVector::Distance(getLoc(player), getLoc(heart)));
+      }
+      else if (auto exit = exitColliders[state + 1])
+      {
+        player->setDistanceToTheGoal(FVector::Distance(getLoc(player), exit->GetComponentLocation()));
+      }
+    }
+    else
+    {
+      player->setDistanceToTheGoal(100.f);
+    }
+  }
 }
 
 auto ACubeMaze::OnConstruction(const FTransform &Transform) -> void
@@ -402,4 +427,12 @@ auto ACubeMaze::updateSidesCollision() -> void
     mobSpawners[state + 1]->spawn();
   for (auto side : sides)
     side->resetNextRegen();
+}
+
+auto ACubeMaze::onHeartDestroyed(AActor *heart) -> void
+{
+  LOG("on heart destroyed");
+  auto it = std::find(std::begin(hearts), std::end(hearts), heart);
+  CHECK_RET(it != std::end(hearts));
+  *it = nullptr;
 }
