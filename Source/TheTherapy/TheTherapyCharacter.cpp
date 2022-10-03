@@ -14,11 +14,17 @@
 #include "UObject/ConstructorHelpers.h"
 #include <Components/PointLightComponent.h>
 #include <GameFramework/PlayerController.h>
+#include <Kismet/GameplayStatics.h>
+#include <QofL/abbr.h>
 #include <QofL/check_ret.h>
 #include <QofL/log.h>
+#include <QofL/obj_finder.h>
+#include <Sound/SoundCue.h>
 
 ATheTherapyCharacter::ATheTherapyCharacter()
-  : light(CreateDefaultSubobject<UPointLightComponent>(TEXT("light")))
+  : light(CreateDefaultSubobject<UPointLightComponent>(TEXT("light"))),
+    stepsSnd(OBJ_FINDER(SoundCue, "Footsteps", "Footsteps")),
+    heartSnd(OBJ_FINDER(SoundCue, "SFX", "SND_Heart_Cue"))
 {
   // Set size for player capsule
   GetCapsuleComponent()->InitCapsuleSize(21.f, 96.0f);
@@ -73,6 +79,7 @@ auto ATheTherapyCharacter::addHeart() -> void
   auto hudUi = hud->hudUi;
   CHECK_RET(hudUi);
   hudUi->setHearts(heartsCount);
+  UGameplayStatics::PlaySoundAtLocation(GetWorld(), heartSnd, getLoc(this));
 }
 
 auto ATheTherapyCharacter::getHeartsCount() -> int
@@ -84,4 +91,10 @@ auto ATheTherapyCharacter::setDistanceToTheGoal(float val) -> void
 {
   auto l = log(val) * .75f - 3.5f;
   light->SetLightColor(FLinearColor{l, 1.f - l, 0.f});
+}
+
+void ATheTherapyCharacter::footStep()
+{
+  LOG("step");
+  UGameplayStatics::PlaySoundAtLocation(GetWorld(), stepsSnd, getLoc(this));
 }

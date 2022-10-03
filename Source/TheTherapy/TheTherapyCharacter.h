@@ -26,6 +26,9 @@ public:
   /** Returns CameraBoom subobject **/
   FORCEINLINE class USpringArmComponent *GetCameraBoom() const { return CameraBoom; }
 
+  UFUNCTION(BlueprintCallable)
+  void footStep();
+
 private:
   auto BeginPlay() -> void final;
   auto Tick(float DeltaSeconds) -> void final;
@@ -42,4 +45,6 @@ private:
   class UPointLightComponent *light;
 
   int heartsCount = 0;
+  class USoundCue *stepsSnd;
+  class USoundCue *heartSnd;
 };

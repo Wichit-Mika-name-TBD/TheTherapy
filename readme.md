@@ -1,0 +1,14 @@
+Whispers:
+- You are a failure
+- Go play roulette
+- One more task
+- One more round of poker
+- You will win next time
+- You cannot sleep
+- Tomorrow is going to be worse
+- You useless
+- Time is fading
+- You ugly
+- You are lazy
+- Get up.
+- Have you really achieved anything?

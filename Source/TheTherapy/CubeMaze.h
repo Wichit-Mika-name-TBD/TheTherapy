@@ -70,4 +70,9 @@ private:
 
   int state = -1;
   float angle = 0.f;
+  class USoundCue *mazeRegenSnd;
+  auto resetNextRegen() -> void;
+  auto getTime() const -> float;
+  float nextRegen = 0.f;
+  class USoundCue *cubeRotationSnd;
 };
