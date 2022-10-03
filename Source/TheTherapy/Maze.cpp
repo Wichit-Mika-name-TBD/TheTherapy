@@ -37,19 +37,12 @@ AMaze::AMaze()
 auto AMaze::BeginPlay() -> void
 {
   Super::BeginPlay();
-  nextRegen = 10.f;
-  regenMaze();
 }
 
 // Called every frame
 auto AMaze::Tick(float DeltaTime) -> void
 {
   Super::Tick(DeltaTime);
-  if (GetWorld()->GetTimeSeconds() > nextRegen)
-  {
-    nextRegen += 10.f;
-    regenMaze();
-  }
 }
 
 auto AMaze::OnConstruction(const FTransform &Transform) -> void
@@ -224,12 +217,3 @@ auto AMaze::regenMaze() -> void
   }
 }
 
-auto AMaze::resetNextRegen() -> void
-{
-  nextRegen = GetWorld()->GetTimeSeconds() + 10.f;
-}
-
-auto AMaze::getTime() const -> float
-{
-  return nextRegen - GetWorld()->GetTimeSeconds();
-}

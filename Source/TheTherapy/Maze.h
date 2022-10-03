@@ -46,16 +46,12 @@ public:
   UPROPERTY(EditAnywhere)
   int rmFraction = 10;
 
-  auto resetNextRegen() -> void;
-  auto getTime() const -> float;
+  auto regenMaze() -> void;
 
 private:
   auto BeginPlay() -> void final;
   auto OnConstruction(const FTransform &Transform) -> void final;
-  auto regenMaze() -> void;
 
   // Called every frame
   auto Tick(float DeltaTime) -> void final;
-
-  float nextRegen = 0.f;
 };

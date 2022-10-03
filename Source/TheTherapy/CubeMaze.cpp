@@ -10,12 +10,18 @@
 #include <Components/BoxComponent.h>
 #include <Components/InstancedStaticMeshComponent.h>
 #include <GameFramework/PlayerController.h>
+#include <Kismet/GameplayStatics.h>
 #include <QofL/abbr.h>
 #include <QofL/check_ret.h>
 #include <QofL/log.h>
+#include <QofL/obj_finder.h>
+#include <Sound/SoundCue.h>
 
 // Sets default values
-ACubeMaze::ACubeMaze() : root(CreateDefaultSubobject<USceneComponent>("root"))
+ACubeMaze::ACubeMaze()
+  : root(CreateDefaultSubobject<USceneComponent>("root")),
+    mazeRegenSnd(OBJ_FINDER(SoundCue, "SFX", "SND_MazeRegen_Cue")),
+    cubeRotationSnd(OBJ_FINDER(SoundCue, "SFX", "SND_CubeRotation_Cue"))
 {
   SetRootComponent(root);
   exitCollider0 = CreateDefaultSubobject<UBoxComponent>("exit0");
@@ -89,6 +95,9 @@ void ACubeMaze::BeginPlay()
   }
   updateSidesVisibility();
   updateSidesCollision();
+  nextRegen = 10.f;
+  for (auto side : sides)
+    side->regenMaze();
 }
 
 // Called every frame
@@ -97,7 +106,8 @@ void ACubeMaze::Tick(float DeltaTime)
   Super::Tick(DeltaTime);
   auto time = GetWorld()->GetTimeSeconds();
 
-  const auto K = 20.;
+  const auto rotTime = 3.;
+  const auto K = 90. / rotTime;
   auto m = FTransform{};
   auto n = FTransform{};
   switch (state)
@@ -316,9 +326,17 @@ void ACubeMaze::Tick(float DeltaTime)
   auto hudUi = hud->hudUi;
   CHECK_RET(hudUi);
   if (state + 1 >= 0 && state + 1 < 6)
-    hudUi->setTime(sides[state + 1]->getTime());
+    hudUi->setTime(getTime());
   else
     hudUi->setTime(0.f);
+
+  if (GetWorld()->GetTimeSeconds() > nextRegen && angle == 90.f)
+  {
+    nextRegen += 10.f;
+    if (state + 1 >= 0 && state + 1 < 6)
+      sides[state + 1]->regenMaze();
+    UGameplayStatics::PlaySound2D(GetWorld(), mazeRegenSnd);
+  }
 }
 
 auto ACubeMaze::OnConstruction(const FTransform &Transform) -> void
@@ -379,6 +397,7 @@ void ACubeMaze::onOverlap(UPrimitiveComponent *HitComponent,
   angle = 0.;
   LOG("state:", state, "hearts:", character->getHeartsCount());
   updateSidesVisibility();
+  UGameplayStatics::PlaySound2D(GetWorld(), cubeRotationSnd);
 }
 
 auto ACubeMaze::updateSidesVisibility() -> void
@@ -436,8 +455,7 @@ auto ACubeMaze::updateSidesCollision() -> void
   }
   if (state + 1 >= 0 && state + 1 < 6)
     mobSpawners[state + 1]->spawn();
-  for (auto side : sides)
-    side->resetNextRegen();
+  resetNextRegen();
 }
 
 auto ACubeMaze::onHeartDestroyed(AActor *heart) -> void
@@ -446,4 +464,14 @@ auto ACubeMaze::onHeartDestroyed(AActor *heart) -> void
   auto it = std::find(std::begin(hearts), std::end(hearts), heart);
   CHECK_RET(it != std::end(hearts));
   *it = nullptr;
+}
+
+auto ACubeMaze::resetNextRegen() -> void
+{
+  nextRegen = GetWorld()->GetTimeSeconds() + 10.f;
+}
+
+auto ACubeMaze::getTime() const -> float
+{
+  return nextRegen - GetWorld()->GetTimeSeconds();
 }
