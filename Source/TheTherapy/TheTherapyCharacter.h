@@ -29,6 +29,9 @@ public:
   UFUNCTION(BlueprintCallable)
   void footStep();
 
+  UFUNCTION(BlueprintCallable)
+  bool isAlive() const;
+
 private:
   auto BeginPlay() -> void final;
   auto Tick(float DeltaSeconds) -> void final;
@@ -44,7 +47,13 @@ private:
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Light, meta = (AllowPrivateAccess = "true"))
   class UPointLightComponent *light;
 
+  UFUNCTION()
+  void onHit(AActor *self, AActor *other, FVector imp, const FHitResult &hit);
+
   int heartsCount = 0;
   class USoundCue *stepsSnd;
   class USoundCue *heartSnd;
+  class USoundCue *deathSnd;
+
+  bool m_isAlive;
 };

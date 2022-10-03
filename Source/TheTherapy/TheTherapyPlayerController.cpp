@@ -77,6 +77,10 @@ void ATheTherapyPlayerController::SetupInputComponent()
 
 void ATheTherapyPlayerController::OnSetDestinationPressed()
 {
+  auto character = Cast<ATheTherapyCharacter>(GetPawnOrSpectator());
+  CHECK_RET(character);
+  if (!character->isAlive())
+    return;
   // We flag that the input is being pressed
   bInputPressed = true;
   // Just in case the character was moving because of a previous short press we stop it
@@ -85,6 +89,10 @@ void ATheTherapyPlayerController::OnSetDestinationPressed()
 
 void ATheTherapyPlayerController::OnSetDestinationReleased()
 {
+  auto character = Cast<ATheTherapyCharacter>(GetPawnOrSpectator());
+  CHECK_RET(character);
+  if (!character->isAlive())
+    return;
   // Player is no longer pressing the input
   bInputPressed = false;
 
@@ -114,6 +122,10 @@ void ATheTherapyPlayerController::OnSetDestinationReleased()
 void ATheTherapyPlayerController::OnTouchPressed(const ETouchIndex::Type FingerIndex,
                                                  const FVector Location)
 {
+  auto character = Cast<ATheTherapyCharacter>(GetPawnOrSpectator());
+  CHECK_RET(character);
+  if (!character->isAlive())
+    return;
   bIsTouch = true;
   OnSetDestinationPressed();
 }
@@ -121,6 +133,10 @@ void ATheTherapyPlayerController::OnTouchPressed(const ETouchIndex::Type FingerI
 void ATheTherapyPlayerController::OnTouchReleased(const ETouchIndex::Type FingerIndex,
                                                   const FVector Location)
 {
+  auto character = Cast<ATheTherapyCharacter>(GetPawnOrSpectator());
+  CHECK_RET(character);
+  if (!character->isAlive())
+    return;
   bIsTouch = false;
   OnSetDestinationReleased();
 }

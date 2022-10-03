@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "HudUi.h"
 #include "Materials/Material.h"
+#include "Mob.h"
 #include "PrjHud.h"
 #include "UObject/ConstructorHelpers.h"
 #include <Components/PointLightComponent.h>
@@ -24,7 +25,8 @@
 ATheTherapyCharacter::ATheTherapyCharacter()
   : light(CreateDefaultSubobject<UPointLightComponent>(TEXT("light"))),
     stepsSnd(OBJ_FINDER(SoundCue, "Footsteps", "Footsteps")),
-    heartSnd(OBJ_FINDER(SoundCue, "SFX", "SND_Heart_Cue"))
+    heartSnd(OBJ_FINDER(SoundCue, "SFX", "SND_Heart_Cue")),
+    deathSnd(OBJ_FINDER(SoundCue, "SFX", "SND_Death_Cue"))
 {
   // Set size for player capsule
   GetCapsuleComponent()->InitCapsuleSize(21.f, 96.0f);
@@ -68,6 +70,8 @@ auto ATheTherapyCharacter::BeginPlay() -> void
 {
   Super::BeginPlay();
   heartsCount = 0;
+  m_isAlive = true;
+  OnActorHit.AddDynamic(this, &ATheTherapyCharacter::onHit);
 }
 
 auto ATheTherapyCharacter::addHeart() -> void
@@ -95,6 +99,22 @@ auto ATheTherapyCharacter::setDistanceToTheGoal(float val) -> void
 
 void ATheTherapyCharacter::footStep()
 {
-  LOG("step");
   UGameplayStatics::PlaySoundAtLocation(GetWorld(), stepsSnd, getLoc(this));
+}
+
+bool ATheTherapyCharacter::isAlive() const
+{
+  return m_isAlive;
+}
+
+void ATheTherapyCharacter::onHit(AActor *self, AActor *other, FVector imp, const FHitResult &hit)
+{
+  auto mob = Cast<AMob>(other);
+  if (!mob)
+    return;
+  if (!m_isAlive)
+    return;
+  LOG("died");
+  m_isAlive = false;
+  UGameplayStatics::PlaySoundAtLocation(GetWorld(), deathSnd, getLoc(this));
 }
