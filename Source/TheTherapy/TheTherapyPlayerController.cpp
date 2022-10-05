@@ -22,6 +22,11 @@ void ATheTherapyPlayerController::PlayerTick(float DeltaTime)
 {
   Super::PlayerTick(DeltaTime);
 
+  auto character = Cast<ATheTherapyCharacter>(GetPawnOrSpectator());
+  CHECK_RET(character);
+  if (!character->isAlive())
+    return;
+
   if (bInputPressed)
   {
     FollowTime += DeltaTime;
@@ -83,8 +88,6 @@ void ATheTherapyPlayerController::OnSetDestinationPressed()
     return;
   // We flag that the input is being pressed
   bInputPressed = true;
-  // Just in case the character was moving because of a previous short press we stop it
-  StopMovement();
 }
 
 void ATheTherapyPlayerController::OnSetDestinationReleased()

@@ -18,6 +18,7 @@ public:
   auto getHeartsCount() -> int;
   auto setDistanceToTheGoal(float) -> void;
   auto won() -> void;
+  auto getObscuringWalls() -> std::vector<class AMaze *>;
 
   /** Returns TopDownCameraComponent subobject **/
   FORCEINLINE class UCameraComponent *GetTopDownCameraComponent() const

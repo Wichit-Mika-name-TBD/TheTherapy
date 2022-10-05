@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include <vector>
 
 #include "Maze.generated.h"
 
@@ -46,12 +47,17 @@ public:
   UPROPERTY(EditAnywhere)
   int rmFraction = 10;
 
+  auto getVisibility() const -> bool;
   auto regenMaze() -> void;
+  auto setVisibility(bool) -> void;
 
 private:
   auto BeginPlay() -> void final;
   auto OnConstruction(const FTransform &Transform) -> void final;
-
-  // Called every frame
   auto Tick(float DeltaTime) -> void final;
+  auto update() -> void;
+
+  std::vector<bool> maze;
+  bool visibility;
+  float lastInvisibleTime = 0.f;
 };

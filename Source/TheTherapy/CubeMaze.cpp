@@ -94,8 +94,7 @@ void ACubeMaze::BeginPlay()
       ++i;
     }
   }
-  updateSidesVisibility();
-  updateSidesCollision();
+  resetMobAndMazeRegen();
   nextRegen = 10.f;
   for (auto side : sides)
     side->regenMaze();
@@ -128,7 +127,7 @@ void ACubeMaze::Tick(float DeltaTime)
     if (angle > 90.)
     {
       angle = 90.;
-      updateSidesCollision();
+      resetMobAndMazeRegen();
     }
     else if (angle == 90.) {}
     else
@@ -154,7 +153,7 @@ void ACubeMaze::Tick(float DeltaTime)
       if (angle > 90.)
       {
         angle = 90.;
-        updateSidesCollision();
+        resetMobAndMazeRegen();
       }
       else if (angle == 90.) {}
       else
@@ -191,7 +190,7 @@ void ACubeMaze::Tick(float DeltaTime)
       if (angle > 90.)
       {
         angle = 90.;
-        updateSidesCollision();
+        resetMobAndMazeRegen();
       }
       else if (angle == 90.) {}
       else
@@ -237,7 +236,7 @@ void ACubeMaze::Tick(float DeltaTime)
       if (angle > 90.)
       {
         angle = 90.;
-        updateSidesCollision();
+        resetMobAndMazeRegen();
       }
       else if (angle == 90.) {}
       else
@@ -292,7 +291,7 @@ void ACubeMaze::Tick(float DeltaTime)
       if (angle > 90.)
       {
         angle = 90.;
-        updateSidesCollision();
+        resetMobAndMazeRegen();
       }
       else if (angle == 90.) {}
       else
@@ -346,6 +345,8 @@ void ACubeMaze::Tick(float DeltaTime)
       sides[state + 1]->regenMaze();
     UGameplayStatics::PlaySound2D(GetWorld(), mazeRegenSnd);
   }
+
+  updateSidesVisibility();
 }
 
 auto ACubeMaze::OnConstruction(const FTransform &Transform) -> void
@@ -417,63 +418,32 @@ void ACubeMaze::onOverlap(UPrimitiveComponent *HitComponent,
   state = idx;
   angle = 0.;
   LOG("state:", state, "hearts:", character->getHeartsCount());
-  updateSidesVisibility();
   UGameplayStatics::PlaySound2D(GetWorld(), cubeRotationSnd);
 }
 
 auto ACubeMaze::updateSidesVisibility() -> void
 {
-  for (auto i = 0; i < 6; ++i)
-    sides[i]->SetActorHiddenInGame(false);
-  switch (state)
+  if (state + 1 < 0 || state + 1 >= 6)
+    return;
+
+  auto controller = GetWorld()->GetFirstPlayerController();
+  CHECK_RET(controller);
+  auto player = Cast<ATheTherapyCharacter>(controller->GetPawnOrSpectator());
+  CHECK_RET(player);
+  auto walls = player->getObscuringWalls();
+  for (auto side : sides)
   {
-  case -1:
-    sides[2]->SetActorHiddenInGame(true);
-    sides[4]->SetActorHiddenInGame(true);
-    break;
-  case 0:
-    sides[4]->SetActorHiddenInGame(true);
-    sides[5]->SetActorHiddenInGame(true);
-    break;
-  case 1:
-    sides[0]->SetActorHiddenInGame(true);
-    sides[5]->SetActorHiddenInGame(true);
-    break;
-  case 2:
-    sides[1]->SetActorHiddenInGame(true);
-    sides[5]->SetActorHiddenInGame(true);
-    break;
-  case 3:
-    sides[1]->SetActorHiddenInGame(true);
-    sides[0]->SetActorHiddenInGame(true);
-    break;
-  case 4:
-    sides[0]->SetActorHiddenInGame(true);
-    sides[3]->SetActorHiddenInGame(true);
-    break;
-  case 5: break;
+    if (side == sides[state + 1])
+    {
+      side->setVisibility(true);
+      continue;
+    }
+    side->setVisibility(std::find(std::begin(walls), std::end(walls), side) == std::end(walls));
   }
 }
 
-auto ACubeMaze::updateSidesCollision() -> void
+auto ACubeMaze::resetMobAndMazeRegen() -> void
 {
-  for (auto i = 0; i < 6; ++i)
-  {
-    auto side = sides[i];
-    auto isVisible = !side->IsHidden();
-    TArray<UActorComponent *> comps;
-    side->GetComponents(UInstancedStaticMeshComponent::StaticClass(), comps, true);
-    for (auto comp : comps)
-    {
-      auto mesh = Cast<UInstancedStaticMeshComponent>(comp);
-      if (!mesh)
-        continue;
-      if (isVisible)
-        mesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
-      else
-        mesh->SetCollisionProfileName(TEXT("NoCollision"));
-    }
-  }
   if (state + 1 >= 0 && state + 1 < 6)
     mobSpawners[state + 1]->spawn();
   resetNextRegen();

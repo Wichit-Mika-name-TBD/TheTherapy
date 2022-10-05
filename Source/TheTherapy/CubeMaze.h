@@ -51,8 +51,8 @@ private:
   auto BeginPlay() -> void final;
   auto OnConstruction(const FTransform &Transform) -> void final;
   auto Tick(float DeltaTime) -> void final;
+  auto resetMobAndMazeRegen() -> void;
   auto updateSidesVisibility() -> void;
-  auto updateSidesCollision() -> void;
 
   FTransform initialTransform;
 

@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "HudUi.h"
 #include "Materials/Material.h"
+#include "Maze.h"
 #include "Mob.h"
 #include "PrjHud.h"
 #include "UObject/ConstructorHelpers.h"
@@ -131,4 +132,25 @@ auto ATheTherapyCharacter::won() -> void
 bool ATheTherapyCharacter::isWin() const
 {
   return m_isWin;
+}
+
+auto ATheTherapyCharacter::getObscuringWalls() -> std::vector<AMaze *>
+{
+  TArray<struct FHitResult> OutHits;
+  if (!GetWorld()->LineTraceMultiByChannel(OutHits,
+                                           TopDownCameraComponent->GetComponentLocation(),
+                                           GetMesh()->GetComponentLocation() + vec(0., 0., 90.),
+                                           ECC_Camera))
+    return {};
+  std::vector<AMaze *> ret;
+  for (auto &hit : OutHits)
+  {
+    if (!hit.Component.Get())
+      continue;
+    auto wall = Cast<AMaze>(hit.Component.Get()->GetOwner());
+    if (!wall)
+      continue;
+    ret.push_back(wall);
+  }
+  return ret;
 }

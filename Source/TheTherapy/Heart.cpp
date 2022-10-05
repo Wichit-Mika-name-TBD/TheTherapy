@@ -11,6 +11,7 @@ AHeart::AHeart()
   mesh->SetStaticMesh(OBJ_FINDER(StaticMesh, "Mesh", "SM_Heart"));
   mesh->SetMobility(EComponentMobility::Movable);
   mesh->SetCanEverAffectNavigation(false);
+  mesh->SetCollisionProfileName(TEXT("InvisibleWall"));
 }
 
 auto AHeart::BeginPlay() -> void

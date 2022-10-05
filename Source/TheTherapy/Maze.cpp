@@ -31,12 +31,21 @@ AMaze::AMaze()
   wallTall->SetStaticMesh(OBJ_FINDER(StaticMesh, "Mesh", "SM_WallTall"));
   floor->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
   floor->SetStaticMesh(OBJ_FINDER(StaticMesh, "Mesh", "SM_Floor"));
+  cornerShort->SetCollisionProfileName(TEXT("InvisibleWall"));
+  cornerTall->SetCollisionProfileName(TEXT("InvisibleWall"));
+  wallShort->SetCollisionProfileName(TEXT("InvisibleWall"));
+  wallTall->SetCollisionProfileName(TEXT("InvisibleWall"));
 }
 
 // Called when the game starts or when spawned
 auto AMaze::BeginPlay() -> void
 {
   Super::BeginPlay();
+  visibility = true;
+  cornerShort->SetCollisionProfileName(TEXT("InvisibleWall"));
+  cornerTall->SetCollisionProfileName(TEXT("InvisibleWall"));
+  wallShort->SetCollisionProfileName(TEXT("InvisibleWall"));
+  wallTall->SetCollisionProfileName(TEXT("InvisibleWall"));
 }
 
 // Called every frame
@@ -53,12 +62,17 @@ auto AMaze::OnConstruction(const FTransform &Transform) -> void
 
 auto AMaze::regenMaze() -> void
 {
+  maze = genMaze(sz, rmFraction);
+  update();
+}
+
+auto AMaze::update() -> void
+{
   wallTall->ClearInstances();
   wallShort->ClearInstances();
   cornerTall->ClearInstances();
   cornerShort->ClearInstances();
   floor->ClearInstances();
-  auto maze = genMaze(sz, rmFraction);
   for (auto y = 0; y < 2 * sz - 1; ++y)
     for (auto x = 0; x < sz - (y + 1) % 2; ++x)
     {
@@ -217,3 +231,29 @@ auto AMaze::regenMaze() -> void
   }
 }
 
+auto AMaze::setVisibility(bool val) -> void
+{
+  if (!val)
+    lastInvisibleTime = GetWorld()->GetTimeSeconds();
+  if (val == visibility)
+    return;
+  if (val && GetWorld()->GetTimeSeconds() < lastInvisibleTime + 0.5f)
+    return;
+  visibility = val;
+  if (val)
+  {
+    SetActorHiddenInGame(false);
+    floor->SetCollisionProfileName(TEXT("BlockAllDynamic"));
+  }
+  else
+  {
+    SetActorHiddenInGame(true);
+    floor->SetCollisionProfileName(TEXT("InvisibleWall"));
+  }
+  update();
+}
+
+auto AMaze::getVisibility() const -> bool
+{
+  return visibility;
+}
